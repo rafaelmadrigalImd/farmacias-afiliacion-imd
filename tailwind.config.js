@@ -16,6 +16,36 @@ export default {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+                // Color principal IMD: #017C80 (turquesa/teal)
+                primary: {
+                    50: '#ecfeff',
+                    100: '#cffafe',
+                    200: '#a5f3fc',
+                    300: '#67e8f9',
+                    400: '#22d3ee',
+                    500: '#017C80',  // Color principal
+                    600: '#016668',
+                    700: '#015155',
+                    800: '#014144',
+                    900: '#013639',
+                    950: '#002328',
+                },
+                // Reemplazar los colores indigo/blue de Jetstream con nuestro color
+                indigo: {
+                    50: '#ecfeff',
+                    100: '#cffafe',
+                    200: '#a5f3fc',
+                    300: '#67e8f9',
+                    400: '#22d3ee',
+                    500: '#017C80',
+                    600: '#016668',
+                    700: '#015155',
+                    800: '#014144',
+                    900: '#013639',
+                    950: '#002328',
+                },
+            },
         },
     },
 
