@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Laravel 12 application for pharmacy affiliation management (farmacias-afiliacion-imd) for Instituto Médico Dermatológico (IMD).
+This is a Laravel 12 application for pharmacy affiliation management (farmacias-afiliacion-imd) for IMD.
 
 **Tech Stack:**
 - **Backend:** Laravel 12, PHP 8.4
@@ -14,6 +14,18 @@ This is a Laravel 12 application for pharmacy affiliation management (farmacias-
 - **Build Tool:** Vite 7
 - **Queue/Cache:** Database-backed
 - **Email Testing:** Mailpit
+
+## Branding Guidelines
+
+**IMPORTANT: Always use "IMD" instead of "Instituto Médico Dermatológico"**
+
+When writing code, comments, documentation, or user-facing text, always use the acronym "IMD" rather than the full name "Instituto Médico Dermatológico". This maintains brand consistency across the application.
+
+Examples:
+- ✅ "Portal de Clientes IMD"
+- ✅ "Bienvenido a IMD"
+- ❌ "Portal de Clientes Instituto Médico Dermatológico"
+- ❌ "Bienvenido a Instituto Médico Dermatológico"
 
 ## ⚠️ IMPORTANT: Laravel Sail Environment
 

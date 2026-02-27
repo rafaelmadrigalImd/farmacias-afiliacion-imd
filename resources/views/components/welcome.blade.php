@@ -4,7 +4,7 @@
     </h1>
 
     <p class="mt-6 text-gray-500 dark:text-gray-400 leading-relaxed">
-        Este portal te permite gestionar las clientes al Instituto Médico Dermatológico de forma centralizada y eficiente.
+        Este portal te permite gestionar las clientes de IMD de forma centralizada y eficiente.
         Desde aquí podrás administrar la información, monitorear el estado y coordinar todas las actividades relacionadas con la red de clientes.
     </p>
 </div>
