@@ -35,4 +35,19 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Cliente API Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for the external Cliente API service.
+    |
+    */
+
+    'cliente_api' => [
+        'base_url' => env('CLIENTE_API_URL', 'https://api.ejemplo.com'),
+        'key' => env('CLIENTE_API_KEY', ''),
+        'timeout' => env('CLIENTE_API_TIMEOUT', 30),
+    ],
+
 ];
