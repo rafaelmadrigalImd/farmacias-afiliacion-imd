@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ClienteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,5 +27,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::get('/user', function (Request $request) {
         return $request->user();
+    });
+
+    // Rutas de Clientes
+    Route::prefix('clientes')->group(function () {
+        Route::get('/', [ClienteController::class, 'index']);
+        Route::get('/{id}', [ClienteController::class, 'show']);
     });
 });
