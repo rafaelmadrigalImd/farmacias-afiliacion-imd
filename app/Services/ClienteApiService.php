@@ -12,8 +12,8 @@ class ClienteApiService
 
     public function __construct()
     {
-        $this->baseUrl = config('services.cliente_api.base_url', 'https://api.ejemplo.com');
-        $this->apiKey = config('services.cliente_api.key', '');
+        $this->baseUrl = env('CRM_API_BASE_URL', 'https://api.ejemplo.com');
+        $this->apiKey = env('CRM_API_KEY', 'https://api.ejemplo.com');
     }
 
     /**
@@ -22,16 +22,30 @@ class ClienteApiService
     public function getAll(array $filters = [])
     {
         try {
+            $body = array_merge([
+                'function' => 'getPacientes',
+            ], $filters);
+
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->apiKey,
-                'Accept' => 'application/json',
-            ])->get($this->baseUrl . '/clientes', $filters);
+                'Content-Type' => 'application/json',
+                'X-Api-Key' => $this->apiKey,
+            ])->send('GET', $this->baseUrl, [
+                'body' => json_encode($body),
+            ]);
 
             if ($response->successful()) {
+                // La API devuelve un array con un objeto dentro
+                $responseData = $response->json();
+
+                // Si es un array, tomar el primer elemento
+                if (is_array($responseData) && isset($responseData[0])) {
+                    $responseData = $responseData[0];
+                }
+
                 return [
                     'success' => true,
-                    'data' => $response->json('data', []),
-                    'meta' => $response->json('meta', []),
+                    'data' => $responseData['data'] ?? [],
+                    'meta' => $responseData['meta'] ?? [],
                 ];
             }
 

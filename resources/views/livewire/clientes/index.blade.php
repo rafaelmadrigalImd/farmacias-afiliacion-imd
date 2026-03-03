@@ -5,7 +5,13 @@
             <div class="flex items-center justify-between">
                 <div class="flex-1">
                     <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Clientes</h1>
-                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">{{ count($clientes) }} clientes registradas</p>
+                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                        @if($clientes->total() > 0)
+                            Mostrando {{ $clientes->firstItem() }}-{{ $clientes->lastItem() }} de {{ $clientes->total() }} clientes
+                        @else
+                            No hay clientes registrados
+                        @endif
+                    </p>
                 </div>
                 <a href="/clientes/create" wire:navigate class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg shadow-sm transition-colors">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -45,23 +51,24 @@
             </div>
         @endif
 
-        @if($loading)
-            <!-- Loading State -->
-            <div class="space-y-3">
-                @for($i = 0; $i < 5; $i++)
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 animate-pulse">
-                        <div class="flex items-center">
-                            <div class="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
-                            <div class="ml-4 flex-1">
-                                <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-                                <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-                            </div>
+        <!-- Loading State -->
+        <div wire:loading class="space-y-3">
+            @for($i = 0; $i < 5; $i++)
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 animate-pulse">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                        <div class="ml-4 flex-1">
+                            <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+                            <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
                         </div>
                     </div>
-                @endfor
-            </div>
-        @else
-            @if(count($clientes) > 0)
+                </div>
+            @endfor
+        </div>
+
+        <!-- Content -->
+        <div wire:loading.remove>
+            @if($clientes->isNotEmpty())
                 <!-- Lista de Clientes - Mobile First -->
                 <div class="space-y-3">
                     @foreach($clientes as $cliente)
@@ -123,6 +130,13 @@
                         </a>
                     @endforeach
                 </div>
+
+                <!-- Paginación -->
+                @if($clientes->hasPages())
+                    <div class="mt-6">
+                        {{ $clientes->links() }}
+                    </div>
+                @endif
             @else
                 <!-- Empty State -->
                 <div class="text-center py-12">
@@ -139,6 +153,6 @@
                     </a>
                 </div>
             @endif
-        @endif
+        </div>
     </div>
 </div>

@@ -2,16 +2,22 @@
 
 namespace App\Livewire\Clientes;
 
-use Livewire\Component;
-use Livewire\Attributes\Layout;
+use App\Helpers\PaginationHelper;
 use App\Services\ClienteApiService;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Url;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 #[Layout('layouts.app')]
 class Index extends Component
 {
-    public $clientes = [];
-    public $loading = true;
+    use WithPagination;
+
+    #[Url(as: 'q')]
     public $search = '';
+
+    public $perPage = 15;
     public $errorMessage = '';
 
     protected $clienteService;
@@ -21,17 +27,25 @@ class Index extends Component
         $this->clienteService = $clienteService;
     }
 
-    public function mount()
+    public function updatedSearch()
     {
-        $this->loadFarmacias();
+        $this->resetPage();
     }
 
-    public function loadFarmacias()
+    public function refreshList()
     {
-        $this->loading = true;
+        $this->dispatch('$refresh');
+    }
+
+    public function render()
+    {
         $this->errorMessage = '';
 
-        $filters = [];
+        $filters = [
+            'page' => $this->getPage(),
+            'per_page' => $this->perPage,
+        ];
+
         if ($this->search) {
             $filters['search'] = $this->search;
         }
@@ -39,27 +53,24 @@ class Index extends Component
         $response = $this->clienteService->getAll($filters);
 
         if ($response['success']) {
-            $this->clientes = $response['data'];
+            $clientes = PaginationHelper::createFromApiResponse(
+                $response['data'],
+                $response['meta'],
+                $this->perPage,
+                $this->getPage()
+            );
         } else {
             $this->errorMessage = $response['message'];
-            $this->clientes = [];
+            $clientes = PaginationHelper::createFromApiResponse(
+                [],
+                ['total' => 0, 'current_page' => 1],
+                $this->perPage,
+                1
+            );
         }
 
-        $this->loading = false;
-    }
-
-    public function updatedSearch()
-    {
-        $this->loadFarmacias();
-    }
-
-    public function refreshList()
-    {
-        $this->loadFarmacias();
-    }
-
-    public function render()
-    {
-        return view('livewire.clientes.index');
+        return view('livewire.clientes.index', [
+            'clientes' => $clientes,
+        ]);
     }
 }
