@@ -93,6 +93,11 @@ class ClienteApiService
                 'function' => 'getPacientes',
             ], $filters);
 
+            Log::info('📤 [getPacientes] Petición al CRM', [
+                'url' => $this->baseUrl,
+                'body' => $body,
+            ]);
+
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'X-Api-Key' => $this->apiKey,
@@ -100,35 +105,58 @@ class ClienteApiService
                 'body' => json_encode($body),
             ]);
 
+            Log::info('📥 [getPacientes] Respuesta del CRM', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
             if ($response->successful()) {
-                // La API devuelve un array con un objeto dentro
                 $responseData = $response->json();
 
-                // Si es un array, tomar el primer elemento
-                if (is_array($responseData) && isset($responseData[0])) {
+                // La API devuelve: [{ "id1": {...}, "id2": {...} }]
+                // Extraer el primer elemento si es un array
+                if (is_array($responseData) && isset($responseData[0]) && is_array($responseData[0])) {
                     $responseData = $responseData[0];
                 }
 
+                // Convertir el objeto con IDs como keys a un array indexado
+                $pacientes = [];
+                if (is_array($responseData)) {
+                    foreach ($responseData as $id => $paciente) {
+                        if (is_array($paciente)) {
+                            $pacientes[] = $paciente;
+                        }
+                    }
+                }
+
+                Log::info('✅ [getPacientes] Pacientes procesados', [
+                    'total' => count($pacientes),
+                ]);
+
                 return [
                     'success' => true,
-                    'data' => $responseData['data'] ?? [],
-                    'meta' => $responseData['meta'] ?? [],
+                    'data' => $pacientes,
+                    'meta' => [
+                        'current_page' => $filters['page'] ?? 1,
+                        'total' => count($pacientes),
+                    ],
                 ];
             }
 
-            Log::error('Error al obtener clientes', [
+            Log::error('❌ [getPacientes] Error al obtener clientes', [
                 'status' => $response->status(),
                 'body' => $response->body(),
             ]);
 
             return [
                 'success' => false,
-                'message' => 'Error al obtener las clientes',
+                'message' => 'Error al obtener los clientes',
                 'data' => [],
             ];
         } catch (\Exception $e) {
-            Log::error('Excepción al obtener clientes', [
+            Log::error('💥 [getPacientes] Excepción al obtener clientes', [
                 'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return [
