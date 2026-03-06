@@ -62,11 +62,18 @@ class Create extends Component
 
     public function mount()
     {
+        // TODO: Descomentar cuando getCentros esté funcionando
         // Cargar lista de centros al inicializar el componente
-        $response = $this->clienteService->getCentros();
-        if ($response['success']) {
-            $this->centros = $response['data'];
-        }
+        // $response = $this->clienteService->getCentros();
+        // if ($response['success']) {
+        //     $this->centros = $response['data'];
+        // }
+
+        // Centros de prueba temporal
+        $this->centros = [
+            ['id' => '9', 'nombre' => 'Centro de Prueba IMD'],
+            ['id' => '10', 'nombre' => 'Centro 2 IMD'],
+        ];
     }
 
     public function save()

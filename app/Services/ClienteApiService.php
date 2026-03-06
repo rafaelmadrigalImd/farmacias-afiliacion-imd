@@ -26,11 +26,23 @@ class ClienteApiService
                 'function' => 'getCentros',
             ];
 
+            Log::info('📤 [getCentros] Petición al CRM', [
+                'url' => $this->baseUrl,
+                'method' => 'GET',
+                'body' => $body,
+                'body_json' => json_encode($body),
+            ]);
+
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'X-Api-Key' => $this->apiKey,
             ])->send('GET', $this->baseUrl, [
                 'body' => json_encode($body),
+            ]);
+
+            Log::info('📥 [getCentros] Respuesta del CRM', [
+                'status' => $response->status(),
+                'body' => $response->body(),
             ]);
 
             if ($response->successful()) {
@@ -47,7 +59,7 @@ class ClienteApiService
                 ];
             }
 
-            Log::error('Error al obtener centros', [
+            Log::error('❌ [getCentros] Error al obtener centros', [
                 'status' => $response->status(),
                 'body' => $response->body(),
             ]);
@@ -58,8 +70,9 @@ class ClienteApiService
                 'data' => [],
             ];
         } catch (\Exception $e) {
-            Log::error('Excepción al obtener centros', [
+            Log::error('💥 [getCentros] Excepción al obtener centros', [
                 'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return [
@@ -188,15 +201,37 @@ class ClienteApiService
     public function create(array $data)
     {
         try {
-            $body = array_merge([
-                'function' => 'createPaciente',
-            ], $data);
+            // Preparar el body con el formato específico requerido por el API
+            $body = [
+                'function' => 'crearPaciente',
+                'nombre' => $data['nombre'] ?? 'Rafa',
+                'apellido1' => $data['apellido1'] ?? 'Test',
+                'apellido2' => $data['apellido2'] ?? 'Test',
+                'email' => $data['email'] ?? 'dfdsf@gmail.com',
+                'movil' => $data['telefono'] ?? '678128386',
+                'centro' => $data['centro_id'] ?? 9,
+            ];
+
+            Log::info('📤 [crearPaciente] Petición al CRM', [
+                'url' => $this->baseUrl,
+                'method' => 'POST',
+                'data_recibida' => $data,
+                'body_preparado' => $body,
+                'body_json' => json_encode($body),
+                'body_json_length' => strlen(json_encode($body)),
+            ]);
 
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'X-Api-Key' => $this->apiKey,
             ])->send('POST', $this->baseUrl, [
                 'body' => json_encode($body),
+            ]);
+
+            Log::info('📥 [crearPaciente] Respuesta del CRM', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+                'headers' => $response->headers(),
             ]);
 
             if ($response->successful()) {
@@ -207,6 +242,8 @@ class ClienteApiService
                     $responseData = $responseData[0];
                 }
 
+                Log::info('✅ [crearPaciente] Paciente creado exitosamente', ['response' => $responseData]);
+
                 return [
                     'success' => $responseData['success'] ?? true,
                     'message' => $responseData['message'] ?? 'Cliente registrado correctamente',
@@ -214,7 +251,7 @@ class ClienteApiService
                 ];
             }
 
-            Log::error('Error al crear cliente', [
+            Log::error('❌ [crearPaciente] Error al crear cliente', [
                 'status' => $response->status(),
                 'body' => $response->body(),
             ]);
@@ -225,8 +262,9 @@ class ClienteApiService
                 'errors' => [],
             ];
         } catch (\Exception $e) {
-            Log::error('Excepción al crear cliente', [
+            Log::error('💥 [crearPaciente] Excepción al crear cliente', [
                 'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return [
