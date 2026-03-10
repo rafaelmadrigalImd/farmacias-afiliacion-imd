@@ -17,7 +17,7 @@ class Index extends Component
     #[Url(as: 'q')]
     public $search = '';
 
-    public $perPage = 15;
+    public $perPage = 5;
     public $errorMessage = '';
 
     protected $clienteService;
@@ -41,10 +41,7 @@ class Index extends Component
     {
         $this->errorMessage = '';
 
-        $filters = [
-            'page' => $this->getPage(),
-            'per_page' => $this->perPage,
-        ];
+        $filters = [];
 
         if ($this->search) {
             $filters['search'] = $this->search;
@@ -53,11 +50,33 @@ class Index extends Component
         $response = $this->clienteService->getAll($filters);
 
         if ($response['success']) {
+            $allClientes = $response['data'];
+            $total = count($allClientes);
+
+            // Filtrar por búsqueda si existe (búsqueda local)
+            if ($this->search) {
+                $searchTerm = strtolower($this->search);
+                $allClientes = array_filter($allClientes, function($cliente) use ($searchTerm) {
+                    return str_contains(strtolower($cliente['nombre'] ?? ''), $searchTerm) ||
+                           str_contains(strtolower($cliente['email'] ?? ''), $searchTerm) ||
+                           str_contains(strtolower($cliente['telefono'] ?? ''), $searchTerm);
+                });
+                $total = count($allClientes);
+            }
+
+            // Paginar localmente
+            $currentPage = $this->getPage();
+            $offset = ($currentPage - 1) * $this->perPage;
+            $paginatedData = array_slice($allClientes, $offset, $this->perPage);
+
             $clientes = PaginationHelper::createFromApiResponse(
-                $response['data'],
-                $response['meta'],
+                $paginatedData,
+                [
+                    'current_page' => $currentPage,
+                    'total' => $total,
+                ],
                 $this->perPage,
-                $this->getPage()
+                $currentPage
             );
         } else {
             $this->errorMessage = $response['message'];
