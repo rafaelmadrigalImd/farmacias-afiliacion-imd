@@ -58,6 +58,8 @@ class Create extends Component
     public $clienteSaved = false;
     public $creatingAppointment = false;
     public $clienteId = ''; // ID del cliente creado
+    public $savingAppointment = false; // Estado de guardando cita
+    public $appointmentSaved = false; // Cita guardada exitosamente
 
     // Datos de la cita
     public $diasLibres = [];
@@ -222,6 +224,9 @@ class Create extends Component
             return;
         }
 
+        $this->savingAppointment = true;
+        $this->errorMessage = '';
+
         // Llamar al servicio para guardar la cita
         $response = $this->clienteService->guardarCita(
             $this->clienteId,
@@ -238,9 +243,15 @@ class Create extends Component
                 'hora' => $this->horaSeleccionada,
             ]);
 
+            $this->savingAppointment = false;
+            $this->appointmentSaved = true;
+
             session()->flash('success', 'Paciente registrado y cita creada correctamente.');
-            return $this->redirect('/clientes', navigate: true);
+
+            // Despachar evento JavaScript para redirigir después de 3 segundos
+            $this->dispatch('cita-guardada');
         } else {
+            $this->savingAppointment = false;
             $this->errorMessage = $response['message'] ?? 'Error al crear la cita.';
 
             Log::error('❌ [guardarCita] Error al crear cita', [

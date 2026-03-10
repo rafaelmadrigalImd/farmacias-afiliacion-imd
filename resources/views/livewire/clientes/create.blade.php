@@ -1,4 +1,16 @@
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900"
+     x-data="{
+         showSuccessModal: @entangle('appointmentSaved'),
+         redirecting: false
+     }"
+     @cita-guardada.window="
+         setTimeout(() => {
+             redirecting = true;
+             setTimeout(() => {
+                 window.location.href = '/clientes';
+             }, 1000);
+         }, 2000);
+     ">
     <!-- Header Mobile-First -->
     <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
         <div class="px-4 sm:px-6 lg:px-8 py-4">
@@ -35,6 +47,40 @@
         @endif
 
         @if($creatingAppointment)
+            <!-- Overlay de Éxito (cuando la cita se ha guardado) -->
+            <div x-show="showSuccessModal"
+                 x-cloak
+                 class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+                 style="display: none;">
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md mx-4 shadow-2xl"
+                     x-show="showSuccessModal"
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 transform scale-90"
+                     x-transition:enter-end="opacity-100 transform scale-100">
+                    <div class="text-center">
+                        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 dark:bg-green-900/30 mb-4"
+                             x-show="!redirecting">
+                            <svg class="h-10 w-10 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">¡Cita Guardada Correctamente!</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-1">
+                            La cita para <span class="font-semibold">{{ $nombre }} {{ $apellido1 }}</span>
+                        </p>
+                        @if($diaSeleccionado && $horaSeleccionada)
+                        <p class="text-gray-600 dark:text-gray-400">
+                            ha sido registrada para el <span class="font-semibold">{{ \Carbon\Carbon::parse($diaSeleccionado)->locale('es')->isoFormat('D [de] MMMM') }}</span> a las <span class="font-semibold">{{ $horaSeleccionada }}</span>
+                        </p>
+                        @endif
+                        <div class="mt-6">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2" x-text="redirecting ? 'Redirigiendo ahora...' : 'Redirigiendo en unos segundos...'"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Flujo de Creación de Cita -->
             <div class="space-y-6">
                 <!-- Mensaje de éxito -->
@@ -129,18 +175,25 @@
                     <button
                         type="button"
                         wire:click="guardarCita"
-                        @if(!$horaSeleccionada) disabled @endif
+                        wire:loading.attr="disabled"
+                        @if(!$horaSeleccionada || $savingAppointment) disabled @endif
                         class="flex-1 sm:flex-initial inline-flex items-center justify-center px-6 py-3 bg-primary-600 hover:bg-primary-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg shadow-sm transition-colors"
                     >
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg wire:loading.remove wire:target="guardarCita" class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        Guardar Cita
+                        <svg wire:loading wire:target="guardarCita" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span wire:loading.remove wire:target="guardarCita">Guardar Cita</span>
+                        <span wire:loading wire:target="guardarCita">Guardando...</span>
                     </button>
                     <button
                         type="button"
                         wire:click="omitirCita"
-                        class="flex-1 sm:flex-initial inline-flex items-center justify-center px-6 py-3 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-lg shadow-sm border border-gray-300 dark:border-gray-600 transition-colors"
+                        @if($savingAppointment) disabled @endif
+                        class="flex-1 sm:flex-initial inline-flex items-center justify-center px-6 py-3 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-lg shadow-sm border border-gray-300 dark:border-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Omitir por ahora
                     </button>
