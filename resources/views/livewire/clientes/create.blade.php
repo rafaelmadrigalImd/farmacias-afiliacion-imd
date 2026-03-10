@@ -9,8 +9,13 @@
                     </svg>
                 </a>
                 <div class="flex-1">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Nuevo Paciente</h1>
-                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Completa la información del paciente</p>
+                    @if($creatingAppointment)
+                        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Agendar Cita</h1>
+                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Selecciona el día y hora para la cita</p>
+                    @else
+                        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Nuevo Paciente</h1>
+                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Completa la información del paciente</p>
+                    @endif
                 </div>
             </div>
         </div>
@@ -29,7 +34,121 @@
             </div>
         @endif
 
-        <form wire:submit="save" class="space-y-6">
+        @if($creatingAppointment)
+            <!-- Flujo de Creación de Cita -->
+            <div class="space-y-6">
+                <!-- Mensaje de éxito -->
+                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-green-600 dark:text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <p class="text-sm text-green-800 dark:text-green-300">
+                            <span class="font-semibold">¡Paciente registrado correctamente!</span>
+                            <br>Ahora puedes agendar una cita para {{ $nombre }} {{ $apellido1 }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Selección de Día -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                        Selecciona un día
+                        @if($diaSeleccionado)
+                            <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Seleccionado
+                            </span>
+                        @endif
+                    </h3>
+
+                    <div class="grid grid-cols-1 gap-3">
+                        @foreach($diasLibres as $dia)
+                            <button
+                                type="button"
+                                wire:click="seleccionarDia('{{ $dia['fecha'] }}')"
+                                class="text-left px-4 py-3 rounded-lg border transition-all {{ $diaSeleccionado === $dia['fecha']
+                                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 ring-2 ring-primary-500'
+                                    : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 hover:border-primary-400 dark:hover:border-primary-500'
+                                }}"
+                            >
+                                <div class="flex items-center justify-between">
+                                    <span class="font-medium text-gray-900 dark:text-white capitalize">
+                                        {{ $dia['formatted'] }}
+                                    </span>
+                                    @if($diaSeleccionado === $dia['fecha'])
+                                        <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    @endif
+                                </div>
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Selección de Hora (visible solo si hay un día seleccionado) -->
+                @if($diaSeleccionado)
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                            Selecciona una hora
+                            @if($horaSeleccionada)
+                                <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    {{ $horaSeleccionada }}
+                                </span>
+                            @endif
+                        </h3>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            @foreach($horasLibres as $hora)
+                                <button
+                                    type="button"
+                                    wire:click="seleccionarHora('{{ $hora['id'] }}', '{{ $hora['hora'] }}')"
+                                    @if(!$hora['disponible']) disabled @endif
+                                    class="px-4 py-3 rounded-lg border font-medium text-center transition-all {{ !$hora['disponible']
+                                        ? 'border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                                        : ($horaSeleccionada === $hora['hora']
+                                            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 ring-2 ring-primary-500'
+                                            : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:border-primary-400 dark:hover:border-primary-500')
+                                    }}"
+                                >
+                                    {{ $hora['hora'] }}
+                                </button>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Botones de Acción -->
+                <div class="flex flex-col sm:flex-row gap-3 sticky bottom-0 bg-gray-50 dark:bg-gray-900 py-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:bg-transparent sm:dark:bg-transparent">
+                    <button
+                        type="button"
+                        wire:click="guardarCita"
+                        @if(!$horaSeleccionada) disabled @endif
+                        class="flex-1 sm:flex-initial inline-flex items-center justify-center px-6 py-3 bg-primary-600 hover:bg-primary-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg shadow-sm transition-colors"
+                    >
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Guardar Cita
+                    </button>
+                    <button
+                        type="button"
+                        wire:click="omitirCita"
+                        class="flex-1 sm:flex-initial inline-flex items-center justify-center px-6 py-3 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-lg shadow-sm border border-gray-300 dark:border-gray-600 transition-colors"
+                    >
+                        Omitir por ahora
+                    </button>
+                </div>
+            </div>
+        @else
+            <!-- Formulario de Cliente -->
+            <form wire:submit="save" class="space-y-6">
             <!-- Información del Paciente -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Información del Paciente</h3>
@@ -276,5 +395,6 @@
                 </a>
             </div>
         </form>
+        @endif
     </div>
 </div>
