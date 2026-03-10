@@ -10,30 +10,45 @@ use App\Services\ClienteApiService;
 #[Layout('layouts.app')]
 class Create extends Component
 {
-    #[Validate('required|min:3')]
+    // Información del Paciente
+    #[Validate('required|min:2')]
     public $nombre = '';
 
+    #[Validate('required|min:2')]
+    public $apellido1 = '';
+
+    #[Validate('sometimes|min:2')]
+    public $apellido2 = '';
+
+    // Centro Médico
+    #[Validate('required')]
+    public $centro_id = '';
+
+    // Contacto
     #[Validate('required|email')]
     public $email = '';
 
     #[Validate('required')]
     public $telefono = '';
 
-    #[Validate('required')]
+    // Ubicación (opcional)
+    #[Validate('sometimes|nullable')]
     public $direccion = '';
 
-    #[Validate('required')]
+    #[Validate('sometimes|nullable')]
     public $ciudad = '';
 
-    #[Validate('required')]
+    #[Validate('sometimes|nullable')]
     public $provincia = '';
 
-    #[Validate('required|regex:/^\d{5}$/')]
+    #[Validate('sometimes|nullable|regex:/^\d{5}$/')]
     public $codigo_postal = '';
 
-    public $cif = '';
-    public $titular = '';
+    // Información adicional
     public $observaciones = '';
+
+    // Lista de centros
+    public $centros = [];
 
     public $saving = false;
     public $errorMessage = '';
@@ -45,6 +60,22 @@ class Create extends Component
         $this->clienteService = $clienteService;
     }
 
+    public function mount()
+    {
+        // TODO: Descomentar cuando getCentros esté funcionando
+        // Cargar lista de centros al inicializar el componente
+        // $response = $this->clienteService->getCentros();
+        // if ($response['success']) {
+        //     $this->centros = $response['data'];
+        // }
+
+        // Centros de prueba temporal
+        $this->centros = [
+            ['id' => '9', 'nombre' => 'Centro de Prueba IMD'],
+            ['id' => '10', 'nombre' => 'Centro 2 IMD'],
+        ];
+    }
+
     public function save()
     {
         $this->validate();
@@ -54,14 +85,15 @@ class Create extends Component
 
         $data = [
             'nombre' => $this->nombre,
+            'apellido1' => $this->apellido1,
+            'apellido2' => $this->apellido2,
+            'centro_id' => $this->centro_id,
             'email' => $this->email,
             'telefono' => $this->telefono,
             'direccion' => $this->direccion,
             'ciudad' => $this->ciudad,
             'provincia' => $this->provincia,
             'codigo_postal' => $this->codigo_postal,
-            'cif' => $this->cif,
-            'titular' => $this->titular,
             'observaciones' => $this->observaciones,
         ];
 

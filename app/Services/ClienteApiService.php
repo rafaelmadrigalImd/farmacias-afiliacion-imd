@@ -17,14 +17,21 @@ class ClienteApiService
     }
 
     /**
-     * Obtener listado de clientes
+     * Obtener listado de centros/clínicas
      */
-    public function getAll(array $filters = [])
+    public function getCentros()
     {
         try {
-            $body = array_merge([
-                'function' => 'getPacientes',
-            ], $filters);
+            $body = [
+                'function' => 'getCentros',
+            ];
+
+            Log::info('📤 [getCentros] Petición al CRM', [
+                'url' => $this->baseUrl,
+                'method' => 'GET',
+                'body' => $body,
+                'body_json' => json_encode($body),
+            ]);
 
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
@@ -33,8 +40,12 @@ class ClienteApiService
                 'body' => json_encode($body),
             ]);
 
+            Log::info('📥 [getCentros] Respuesta del CRM', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
             if ($response->successful()) {
-                // La API devuelve un array con un objeto dentro
                 $responseData = $response->json();
 
                 // Si es un array, tomar el primer elemento
@@ -45,23 +56,107 @@ class ClienteApiService
                 return [
                     'success' => true,
                     'data' => $responseData['data'] ?? [],
-                    'meta' => $responseData['meta'] ?? [],
                 ];
             }
 
-            Log::error('Error al obtener clientes', [
+            Log::error('❌ [getCentros] Error al obtener centros', [
                 'status' => $response->status(),
                 'body' => $response->body(),
             ]);
 
             return [
                 'success' => false,
-                'message' => 'Error al obtener las clientes',
+                'message' => 'Error al obtener los centros',
                 'data' => [],
             ];
         } catch (\Exception $e) {
-            Log::error('Excepción al obtener clientes', [
+            Log::error('💥 [getCentros] Excepción al obtener centros', [
                 'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Error de conexión con el servidor',
+                'data' => [],
+            ];
+        }
+    }
+
+    /**
+     * Obtener listado de clientes
+     */
+    public function getAll(array $filters = [])
+    {
+        try {
+            $body = array_merge([
+                'function' => 'getPacientes',
+            ], $filters);
+
+            Log::info('📤 [getPacientes] Petición al CRM', [
+                'url' => $this->baseUrl,
+                'body' => $body,
+            ]);
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'X-Api-Key' => $this->apiKey,
+            ])->send('GET', $this->baseUrl, [
+                'body' => json_encode($body),
+            ]);
+
+            Log::info('📥 [getPacientes] Respuesta del CRM', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            if ($response->successful()) {
+                $responseData = $response->json();
+
+                // La API devuelve: [{ "id1": {...}, "id2": {...} }]
+                // Extraer el primer elemento si es un array
+                if (is_array($responseData) && isset($responseData[0]) && is_array($responseData[0])) {
+                    $responseData = $responseData[0];
+                }
+
+                // Convertir el objeto con IDs como keys a un array indexado
+                $pacientes = [];
+                if (is_array($responseData)) {
+                    foreach ($responseData as $id => $paciente) {
+                        if (is_array($paciente)) {
+                            $pacientes[] = $paciente;
+                        }
+                    }
+                }
+
+                Log::info('✅ [getPacientes] Pacientes procesados', [
+                    'total' => count($pacientes),
+                ]);
+
+                return [
+                    'success' => true,
+                    'data' => $pacientes,
+                    'meta' => [
+                        'current_page' => $filters['page'] ?? 1,
+                        'total' => count($pacientes),
+                    ],
+                ];
+            }
+
+            Log::error('❌ [getPacientes] Error al obtener clientes', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Error al obtener los clientes',
+                'data' => [],
+            ];
+        } catch (\Exception $e) {
+            Log::error('💥 [getPacientes] Excepción al obtener clientes', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return [
@@ -78,21 +173,40 @@ class ClienteApiService
     public function getById(string $id)
     {
         try {
+            $body = [
+                'function' => 'getPaciente',
+                'id' => $id,
+            ];
+
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->apiKey,
-                'Accept' => 'application/json',
-            ])->get($this->baseUrl . '/clientes/' . $id);
+                'Content-Type' => 'application/json',
+                'X-Api-Key' => $this->apiKey,
+            ])->send('GET', $this->baseUrl, [
+                'body' => json_encode($body),
+            ]);
 
             if ($response->successful()) {
+                $responseData = $response->json();
+
+                // Si es un array, tomar el primer elemento
+                if (is_array($responseData) && isset($responseData[0])) {
+                    $responseData = $responseData[0];
+                }
+
                 return [
-                    'success' => true,
-                    'data' => $response->json('data'),
+                    'success' => $responseData['success'] ?? true,
+                    'data' => $responseData['data'] ?? null,
                 ];
             }
 
+            Log::error('Error al obtener cliente', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
             return [
                 'success' => false,
-                'message' => 'Farmacia no encontrada',
+                'message' => 'Cliente no encontrado',
                 'data' => null,
             ];
         } catch (\Exception $e) {
@@ -115,27 +229,70 @@ class ClienteApiService
     public function create(array $data)
     {
         try {
+            // Preparar el body con el formato específico requerido por el API
+            $body = [
+                'function' => 'crearPaciente',
+                'nombre' => $data['nombre'] ?? 'Rafa',
+                'apellido1' => $data['apellido1'] ?? 'Test',
+                'apellido2' => $data['apellido2'] ?? 'Test',
+                'email' => $data['email'] ?? 'dfdsf@gmail.com',
+                'movil' => $data['telefono'] ?? '678128386',
+                'centro' => $data['centro_id'] ?? 9,
+            ];
+
+            Log::info('📤 [crearPaciente] Petición al CRM', [
+                'url' => $this->baseUrl,
+                'method' => 'POST',
+                'data_recibida' => $data,
+                'body_preparado' => $body,
+                'body_json' => json_encode($body),
+                'body_json_length' => strlen(json_encode($body)),
+            ]);
+
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->apiKey,
-                'Accept' => 'application/json',
-            ])->post($this->baseUrl . '/clientes', $data);
+                'Content-Type' => 'application/json',
+                'X-Api-Key' => $this->apiKey,
+            ])->send('POST', $this->baseUrl, [
+                'body' => json_encode($body),
+            ]);
+
+            Log::info('📥 [crearPaciente] Respuesta del CRM', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+                'headers' => $response->headers(),
+            ]);
 
             if ($response->successful()) {
+                $responseData = $response->json();
+
+                // Si es un array, tomar el primer elemento
+                if (is_array($responseData) && isset($responseData[0])) {
+                    $responseData = $responseData[0];
+                }
+
+                Log::info('✅ [crearPaciente] Paciente creado exitosamente', ['response' => $responseData]);
+
                 return [
-                    'success' => true,
-                    'message' => 'Farmacia registrada correctamente',
-                    'data' => $response->json('data'),
+                    'success' => $responseData['success'] ?? true,
+                    'message' => $responseData['message'] ?? 'Cliente registrado correctamente',
+                    'data' => $responseData['data'] ?? null,
                 ];
             }
 
+            Log::error('❌ [crearPaciente] Error al crear cliente', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
             return [
                 'success' => false,
-                'message' => $response->json('message', 'Error al crear la cliente'),
-                'errors' => $response->json('errors', []),
+                'message' => 'Error al crear el cliente',
+                'errors' => [],
             ];
         } catch (\Exception $e) {
-            Log::error('Excepción al crear cliente', [
+            Log::error('💥 [crearPaciente] Excepción al crear cliente', [
                 'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return [
@@ -151,23 +308,42 @@ class ClienteApiService
     public function update(string $id, array $data)
     {
         try {
+            $body = array_merge([
+                'function' => 'updatePaciente',
+                'id' => $id,
+            ], $data);
+
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->apiKey,
-                'Accept' => 'application/json',
-            ])->put($this->baseUrl . '/clientes/' . $id, $data);
+                'Content-Type' => 'application/json',
+                'X-Api-Key' => $this->apiKey,
+            ])->send('PUT', $this->baseUrl, [
+                'body' => json_encode($body),
+            ]);
 
             if ($response->successful()) {
+                $responseData = $response->json();
+
+                // Si es un array, tomar el primer elemento
+                if (is_array($responseData) && isset($responseData[0])) {
+                    $responseData = $responseData[0];
+                }
+
                 return [
-                    'success' => true,
-                    'message' => 'Farmacia actualizada correctamente',
-                    'data' => $response->json('data'),
+                    'success' => $responseData['success'] ?? true,
+                    'message' => $responseData['message'] ?? 'Cliente actualizado correctamente',
+                    'data' => $responseData['data'] ?? null,
                 ];
             }
 
+            Log::error('Error al actualizar cliente', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
             return [
                 'success' => false,
-                'message' => $response->json('message', 'Error al actualizar la cliente'),
-                'errors' => $response->json('errors', []),
+                'message' => 'Error al actualizar el cliente',
+                'errors' => [],
             ];
         } catch (\Exception $e) {
             Log::error('Excepción al actualizar cliente', [
@@ -188,21 +364,40 @@ class ClienteApiService
     public function delete(string $id)
     {
         try {
+            $body = [
+                'function' => 'deletePaciente',
+                'id' => $id,
+            ];
+
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->apiKey,
-                'Accept' => 'application/json',
-            ])->delete($this->baseUrl . '/clientes/' . $id);
+                'Content-Type' => 'application/json',
+                'X-Api-Key' => $this->apiKey,
+            ])->send('DELETE', $this->baseUrl, [
+                'body' => json_encode($body),
+            ]);
 
             if ($response->successful()) {
+                $responseData = $response->json();
+
+                // Si es un array, tomar el primer elemento
+                if (is_array($responseData) && isset($responseData[0])) {
+                    $responseData = $responseData[0];
+                }
+
                 return [
-                    'success' => true,
-                    'message' => 'Farmacia eliminada correctamente',
+                    'success' => $responseData['success'] ?? true,
+                    'message' => $responseData['message'] ?? 'Cliente eliminado correctamente',
                 ];
             }
 
+            Log::error('Error al eliminar cliente', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
             return [
                 'success' => false,
-                'message' => $response->json('message', 'Error al eliminar la cliente'),
+                'message' => 'Error al eliminar el cliente',
             ];
         } catch (\Exception $e) {
             Log::error('Excepción al eliminar cliente', [

@@ -9,8 +9,8 @@
                     </svg>
                 </a>
                 <div class="flex-1">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Nueva Cliente</h1>
-                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Completa la información de la cliente</p>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Nuevo Paciente</h1>
+                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Completa la información del paciente</p>
                 </div>
             </div>
         </div>
@@ -30,67 +30,94 @@
         @endif
 
         <form wire:submit="save" class="space-y-6">
-            <!-- Información Básica -->
+            <!-- Información del Paciente -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Información Básica</h3>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Información del Paciente</h3>
 
                 <div class="space-y-4">
                     <!-- Nombre -->
                     <div>
                         <label for="nombre" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Nombre de la Cliente <span class="text-red-500">*</span>
+                            Nombre <span class="text-red-500">*</span>
                         </label>
                         <input
                             type="text"
                             id="nombre"
                             wire:model="nombre"
                             class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                            placeholder="Ej: Cliente Central"
+                            placeholder="Ej: Juan"
                         >
                         @error('nombre')
                             <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <!-- CIF -->
-                    <div>
-                        <label for="cif" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            CIF
-                        </label>
-                        <input
-                            type="text"
-                            id="cif"
-                            wire:model="cif"
-                            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                            placeholder="A12345678"
-                        >
-                        @error('cif')
-                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    <!-- Apellidos -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="apellido1" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Primer Apellido <span class="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="apellido1"
+                                wire:model="apellido1"
+                                class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                placeholder="Ej: García"
+                            >
+                            @error('apellido1')
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
+                        </div>
 
-                    <!-- Titular -->
-                    <div>
-                        <label for="titular" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Titular
-                        </label>
-                        <input
-                            type="text"
-                            id="titular"
-                            wire:model="titular"
-                            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                            placeholder="Nombre del titular"
-                        >
-                        @error('titular')
-                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                        @enderror
+                        <div>
+                            <label for="apellido2" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Segundo Apellido
+                            </label>
+                            <input
+                                type="text"
+                                id="apellido2"
+                                wire:model="apellido2"
+                                class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                placeholder="Ej: López"
+                            >
+                            @error('apellido2')
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Centro Médico -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Centro Médico</h3>
+
+                <div>
+                    <label for="centro_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Centro <span class="text-red-500">*</span>
+                    </label>
+                    <select
+                        id="centro_id"
+                        wire:model="centro_id"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    >
+                        <option value="">Selecciona un centro</option>
+                        @foreach($centros as $centro)
+                            <option value="{{ $centro['id'] ?? $centro['codigo'] }}">
+                                {{ $centro['nombre'] }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('centro_id')
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
 
             <!-- Contacto -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Datos de Contacto</h3>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Contacto</h3>
 
                 <div class="space-y-4">
                     <!-- Email -->
@@ -129,15 +156,15 @@
                 </div>
             </div>
 
-            <!-- Dirección -->
+            <!-- Ubicación (opcional) -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Ubicación</h3>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Ubicación <span class="text-sm font-normal text-gray-500 dark:text-gray-400">(Opcional)</span></h3>
 
                 <div class="space-y-4">
                     <!-- Dirección -->
                     <div>
                         <label for="direccion" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Dirección <span class="text-red-500">*</span>
+                            Dirección
                         </label>
                         <input
                             type="text"
@@ -155,7 +182,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label for="ciudad" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Ciudad <span class="text-red-500">*</span>
+                                Ciudad
                             </label>
                             <input
                                 type="text"
@@ -171,13 +198,12 @@
 
                         <div>
                             <label for="codigo_postal" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                C.P. <span class="text-red-500">*</span>
+                                Código Postal
                             </label>
                             <input
                                 type="text"
                                 id="codigo_postal"
                                 wire:model="codigo_postal"
-                                maxlength="5"
                                 class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                 placeholder="28001"
                             >
@@ -190,7 +216,7 @@
                     <!-- Provincia -->
                     <div>
                         <label for="provincia" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Provincia <span class="text-red-500">*</span>
+                            Provincia
                         </label>
                         <input
                             type="text"
@@ -238,7 +264,7 @@
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    <span wire:loading.remove wire:target="save">Registrar Cliente</span>
+                    <span wire:loading.remove wire:target="save">Registrar Paciente</span>
                     <span wire:loading wire:target="save">Registrando...</span>
                 </button>
                 <a
