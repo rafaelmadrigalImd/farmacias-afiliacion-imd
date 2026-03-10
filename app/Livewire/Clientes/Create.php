@@ -57,6 +57,7 @@ class Create extends Component
     // Control de flujo para creación de cita
     public $clienteSaved = false;
     public $creatingAppointment = false;
+    public $clienteId = ''; // ID del cliente creado
 
     // Datos de la cita
     public $diasLibres = [];
@@ -136,6 +137,15 @@ class Create extends Component
         $response = $this->clienteService->create($data);
 
         if ($response['success']) {
+            // Guardar el ID del cliente creado
+            $this->clienteId = $response['data']['cliente_id'] ?? '';
+
+            Log::info('✅ [save] Cliente creado, iniciando flujo de cita', [
+                'cliente_id' => $this->clienteId,
+                'nombre' => $this->nombre,
+                'apellido1' => $this->apellido1,
+            ]);
+
             // En lugar de redirigir, activar el flujo de creación de cita
             $this->clienteSaved = true;
             $this->creatingAppointment = true;
@@ -197,15 +207,47 @@ class Create extends Component
 
     public function guardarCita()
     {
+        // Validaciones
         if (empty($this->diaSeleccionado) || empty($this->horaSeleccionada)) {
             $this->errorMessage = 'Debes seleccionar un día y una hora para la cita.';
             return;
         }
 
-        // TODO: Aquí se implementará la lógica backend para guardar la cita
-        // Por ahora solo mostramos mensaje de éxito y redirigimos
-        session()->flash('success', 'Paciente registrado y cita creada correctamente.');
-        return $this->redirect('/clientes', navigate: true);
+        if (empty($this->clienteId)) {
+            $this->errorMessage = 'No se pudo obtener el ID del cliente.';
+            Log::error('❌ [guardarCita] ClienteId vacío', [
+                'cliente_saved' => $this->clienteSaved,
+                'creating_appointment' => $this->creatingAppointment,
+            ]);
+            return;
+        }
+
+        // Llamar al servicio para guardar la cita
+        $response = $this->clienteService->guardarCita(
+            $this->clienteId,
+            $this->centro_id,
+            $this->diaSeleccionado,
+            $this->horaIdSeleccionada,
+            $this->observaciones
+        );
+
+        if ($response['success']) {
+            Log::info('✅ [guardarCita] Cita creada exitosamente para el cliente', [
+                'cliente_id' => $this->clienteId,
+                'fecha' => $this->diaSeleccionado,
+                'hora' => $this->horaSeleccionada,
+            ]);
+
+            session()->flash('success', 'Paciente registrado y cita creada correctamente.');
+            return $this->redirect('/clientes', navigate: true);
+        } else {
+            $this->errorMessage = $response['message'] ?? 'Error al crear la cita.';
+
+            Log::error('❌ [guardarCita] Error al crear cita', [
+                'cliente_id' => $this->clienteId,
+                'mensaje' => $this->errorMessage,
+            ]);
+        }
     }
 
     public function omitirCita()
