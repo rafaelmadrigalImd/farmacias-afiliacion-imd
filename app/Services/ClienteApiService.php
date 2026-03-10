@@ -411,4 +411,191 @@ class ClienteApiService
             ];
         }
     }
+
+    /**
+     * Obtener horas disponibles para un día y centro específico
+     */
+    public function getHorasDisponibles(string $centroId, string $fecha)
+    {
+        try {
+            // Usar credenciales específicas para este endpoint
+            $baseUrl2 = env('CRM_API_BASE_URL2', 'https://api2.imdermatologico.es/web.php');
+            $apiKey2 = env('CRM_API_KEY2', '');
+
+            // Convertir fecha de Y-m-d a d-m-Y según espera la API
+            $fechaFormateada = \Carbon\Carbon::parse($fecha)->format('d-m-Y');
+
+            // TODO: TEMPORAL - Usar centro 4 fijo para pruebas
+            $centroId = 4;
+
+            $body = [
+                'function' => 'getHorasDiaDisponiblesClinica',
+                'centro' => (int) $centroId,
+                'dia' => $fechaFormateada,
+                'key' => $apiKey2,
+            ];
+
+            Log::info('📤 [getHorasDisponibles] Petición al CRM', [
+                'url' => $baseUrl2,
+                'method' => 'GET',
+                'body' => $body,
+                'body_json' => json_encode($body),
+            ]);
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+            ])->send('GET', $baseUrl2, [
+                'body' => json_encode($body),
+            ]);
+
+            Log::info('📥 [getHorasDisponibles] Respuesta del CRM', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            if ($response->successful()) {
+                $responseData = $response->json();
+
+                // Extraer el array de horas disponibles
+                $horasDisponibles = $responseData['horas_disponibles'] ?? [];
+
+                // Transformar el formato de la API al formato esperado por el componente
+                // API: { "914": "08:00", "915": "08:30", ... }
+                // Componente: [{ "id": "914", "hora": "08:00", "disponible": true }, ...]
+                $horasTransformadas = [];
+                foreach ($horasDisponibles as $id => $hora) {
+                    $horasTransformadas[] = [
+                        'id' => $id,
+                        'hora' => $hora,
+                        'disponible' => true,
+                    ];
+                }
+
+                Log::info('✅ [getHorasDisponibles] Horas procesadas', [
+                    'total' => count($horasTransformadas),
+                    'centro' => $centroId,
+                    'fecha' => $fechaFormateada,
+                ]);
+
+                return [
+                    'success' => true,
+                    'data' => $horasTransformadas,
+                ];
+            }
+
+            Log::error('❌ [getHorasDisponibles] Error al obtener horas', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Error al obtener las horas disponibles',
+                'data' => [],
+            ];
+        } catch (\Exception $e) {
+            Log::error('💥 [getHorasDisponibles] Excepción al obtener horas', [
+                'centro' => $centroId,
+                'fecha' => $fecha,
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Error de conexión con el servidor',
+                'data' => [],
+            ];
+        }
+    }
+
+    /**
+     * Guardar cita online desde farmacia
+     */
+    public function guardarCita(string $clienteId, string $centroId, string $fecha, string $horaId, string $observaciones = '')
+    {
+        try {
+            // Usar credenciales específicas para este endpoint
+            $baseUrl2 = env('CRM_API_BASE_URL2', 'https://api2.imdermatologico.es/web.php');
+            $apiKey2 = env('CRM_API_KEY2', '');
+
+            // Convertir fecha de Y-m-d a d-m-Y según espera la API
+            $fechaFormateada = \Carbon\Carbon::parse($fecha)->format('d-m-Y');
+
+            // TODO: TEMPORAL - Usar centro 4 fijo para pruebas
+            $centroId = 4;
+
+            $body = [
+                'function' => 'guardarCitaOnlineDesdeFarmacia',
+                'id_cliente' => $clienteId,
+                'centro' => (int) $centroId,
+                'dia' => $fechaFormateada,
+                'hora_id' => (int) $horaId,
+                'observaciones' => $observaciones,
+                'key' => $apiKey2,
+            ];
+
+            Log::info('📤 [guardarCita] Petición al CRM', [
+                'url' => $baseUrl2,
+                'method' => 'POST',
+                'body' => $body,
+                'body_json' => json_encode($body),
+            ]);
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+            ])->send('POST', $baseUrl2, [
+                'body' => json_encode($body),
+            ]);
+
+            Log::info('📥 [guardarCita] Respuesta del CRM', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            if ($response->successful()) {
+                $responseData = $response->json();
+
+                Log::info('✅ [guardarCita] Cita guardada exitosamente', [
+                    'response' => $responseData,
+                    'cliente_id' => $clienteId,
+                    'centro' => $centroId,
+                    'fecha' => $fechaFormateada,
+                    'hora_id' => $horaId,
+                ]);
+
+                return [
+                    'success' => true,
+                    'message' => $responseData['message'] ?? 'Cita creada correctamente',
+                    'data' => $responseData['data'] ?? $responseData,
+                ];
+            }
+
+            Log::error('❌ [guardarCita] Error al guardar cita', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Error al crear la cita',
+                'data' => null,
+            ];
+        } catch (\Exception $e) {
+            Log::error('💥 [guardarCita] Excepción al guardar cita', [
+                'cliente_id' => $clienteId,
+                'centro' => $centroId,
+                'fecha' => $fecha,
+                'hora_id' => $horaId,
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Error de conexión con el servidor',
+                'data' => null,
+            ];
+        }
+    }
 }
