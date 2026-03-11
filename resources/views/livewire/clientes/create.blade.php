@@ -295,7 +295,7 @@
                     <!-- Email -->
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Email <span class="text-red-500">*</span>
+                            Email
                         </label>
                         <input
                             type="email"
@@ -328,7 +328,8 @@
                 </div>
             </div>
 
-            <!-- Ubicación (opcional) -->
+            {{-- TODO: TEMPORAL - Ubicación comentada --}}
+            {{-- <!-- Ubicación (opcional) -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Ubicación <span class="text-sm font-normal text-gray-500 dark:text-gray-400">(Opcional)</span></h3>
 
@@ -402,7 +403,7 @@
                         @enderror
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Observaciones -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">

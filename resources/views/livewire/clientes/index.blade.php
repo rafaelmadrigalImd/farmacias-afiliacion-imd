@@ -110,12 +110,12 @@
                                                 </p>
                                             @endif
 
-                                            @if(!empty($cliente['centro']))
+                                            @if(!empty($cliente['centro_nombre']))
                                                 <p class="text-sm text-gray-600 dark:text-gray-400 flex items-center">
                                                     <svg class="w-4 h-4 mr-1.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                                     </svg>
-                                                    Centro #{{ $cliente['centro'] }}
+                                                    {{ $cliente['centro_nombre'] }}
                                                 </p>
                                             @endif
                                         </div>
@@ -140,12 +140,18 @@
 
                                             @if(!empty($cliente['contratos']))
                                                 @php
-                                                    $contratoClasses = $cliente['contratos'] === 'activo'
-                                                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400'
-                                                        : 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400';
+                                                    $contratoClasses = match($cliente['contratos']) {
+                                                        'activo' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
+                                                        'sin contratos' => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+                                                        default => 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'
+                                                    };
+
+                                                    $contratoTexto = $cliente['contratos'] === 'sin contratos'
+                                                        ? 'Sin contratos'
+                                                        : 'Contrato ' . ucfirst($cliente['contratos']);
                                                 @endphp
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $contratoClasses }}">
-                                                    Contrato {{ ucfirst($cliente['contratos']) }}
+                                                    {{ $contratoTexto }}
                                                 </span>
                                             @endif
                                         </div>

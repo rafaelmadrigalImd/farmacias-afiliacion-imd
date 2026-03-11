@@ -26,7 +26,7 @@ class Create extends Component
     public $centro_id = '';
 
     // Contacto
-    #[Validate('required|email')]
+    #[Validate('nullable|email')]
     public $email = '';
 
     #[Validate('required')]
