@@ -37,6 +37,54 @@ class Index extends Component
         $this->dispatch('$refresh');
     }
 
+    private function getCentros()
+    {
+        return [
+            '2' => 'Mostoles',
+            '4' => 'Principe',
+            '5' => 'M. Urquijo',
+            '6' => 'Alcalá',
+            '7' => 'Valencia',
+            '8' => 'Oviedo',
+            '9' => 'Sevilla',
+            '10' => 'Raimundo',
+            '11' => 'Murcia',
+            '58' => 'Casanova',
+            '76' => 'Doctor Esquerdo',
+            '97' => 'Castellana',
+            '98' => 'Claris',
+            '316' => 'Bilbao',
+            '377' => 'Alicante',
+            '411' => 'Málaga',
+            '418' => 'Lesseps',
+            '443' => 'Palma de Mallorca',
+            '489' => 'Zaragoza',
+            '505' => 'Valladolid',
+            '544' => 'Córdoba',
+            '579' => 'Vigo',
+        ];
+    }
+
+    private function procesarClientes($clientes)
+    {
+        $centros = $this->getCentros();
+
+        return array_map(function($cliente) use ($centros) {
+            // Transformar centro de ID a nombre
+            if (!empty($cliente['centro'])) {
+                $centroId = $cliente['centro'];
+                $cliente['centro_nombre'] = $centros[$centroId] ?? "Centro #{$centroId}";
+            }
+
+            // Transformar contratos "0" a "sin contratos"
+            if (isset($cliente['contratos']) && ($cliente['contratos'] === '0' || $cliente['contratos'] === 0)) {
+                $cliente['contratos'] = 'sin contratos';
+            }
+
+            return $cliente;
+        }, $clientes);
+    }
+
     public function render()
     {
         $this->errorMessage = '';
@@ -51,6 +99,10 @@ class Index extends Component
 
         if ($response['success']) {
             $allClientes = $response['data'];
+
+            // Procesar clientes (transformar centro y contratos)
+            $allClientes = $this->procesarClientes($allClientes);
+
             $total = count($allClientes);
 
             // Filtrar por búsqueda si existe (búsqueda local)
