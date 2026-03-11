@@ -169,40 +169,53 @@ class ClienteApiService
 
     /**
      * Obtener una cliente por ID
+     * Nota: Como la API no soporta getPaciente individual correctamente,
+     * obtenemos el listado completo y filtramos por ID localmente
      */
     public function getById(string $id)
     {
         try {
-            $body = [
-                'function' => 'getPaciente',
-                'id' => $id,
-            ];
+            Log::info('📤 [getById] Obteniendo cliente', ['id' => $id]);
 
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-                'X-Api-Key' => $this->apiKey,
-            ])->send('GET', $this->baseUrl, [
-                'body' => json_encode($body),
-            ]);
+            // Obtener todos los pacientes
+            $response = $this->getAll();
 
-            if ($response->successful()) {
-                $responseData = $response->json();
-
-                // Si es un array, tomar el primer elemento
-                if (is_array($responseData) && isset($responseData[0])) {
-                    $responseData = $responseData[0];
-                }
+            if (!$response['success']) {
+                Log::error('❌ [getById] Error al obtener listado de pacientes', [
+                    'id' => $id,
+                ]);
 
                 return [
-                    'success' => $responseData['success'] ?? true,
-                    'data' => $responseData['data'] ?? null,
+                    'success' => false,
+                    'message' => 'Error al obtener el cliente',
+                    'data' => null,
                 ];
             }
 
-            Log::error('Error al obtener cliente', [
-                'status' => $response->status(),
-                'body' => $response->body(),
-            ]);
+            // Buscar el paciente por ID en el array
+            $pacientes = $response['data'] ?? [];
+            $pacienteEncontrado = null;
+
+            foreach ($pacientes as $paciente) {
+                if (isset($paciente['id']) && $paciente['id'] === $id) {
+                    $pacienteEncontrado = $paciente;
+                    break;
+                }
+            }
+
+            if ($pacienteEncontrado) {
+                Log::info('✅ [getById] Cliente encontrado', [
+                    'id' => $id,
+                    'nombre' => $pacienteEncontrado['nombre'] ?? 'N/A',
+                ]);
+
+                return [
+                    'success' => true,
+                    'data' => $pacienteEncontrado,
+                ];
+            }
+
+            Log::warning('⚠️ [getById] Cliente no encontrado', ['id' => $id]);
 
             return [
                 'success' => false,
@@ -210,9 +223,10 @@ class ClienteApiService
                 'data' => null,
             ];
         } catch (\Exception $e) {
-            Log::error('Excepción al obtener cliente', [
+            Log::error('💥 [getById] Excepción al obtener cliente', [
                 'id' => $id,
                 'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return [
@@ -237,7 +251,7 @@ class ClienteApiService
                 'apellido2' => $data['apellido2'] ?? 'Test',
                 'email' => $data['email'] ?? 'dfdsf@gmail.com',
                 'movil' => $data['telefono'] ?? '678128386',
-                'centro' => $data['centro_id'] ?? 9,
+                'centro' => (int) ($data['centro_id'] ?? 4),
             ];
 
             Log::info('📤 [crearPaciente] Petición al CRM', [
@@ -425,9 +439,6 @@ class ClienteApiService
             // Convertir fecha de Y-m-d a d-m-Y según espera la API
             $fechaFormateada = \Carbon\Carbon::parse($fecha)->format('d-m-Y');
 
-            // TODO: TEMPORAL - Usar centro 4 fijo para pruebas
-            $centroId = 4;
-
             $body = [
                 'function' => 'getHorasDiaDisponiblesClinica',
                 'centro' => (int) $centroId,
@@ -521,9 +532,6 @@ class ClienteApiService
 
             // Convertir fecha de Y-m-d a d-m-Y según espera la API
             $fechaFormateada = \Carbon\Carbon::parse($fecha)->format('d-m-Y');
-
-            // TODO: TEMPORAL - Usar centro 4 fijo para pruebas
-            $centroId = 4;
 
             $body = [
                 'function' => 'guardarCitaOnlineDesdeFarmacia',

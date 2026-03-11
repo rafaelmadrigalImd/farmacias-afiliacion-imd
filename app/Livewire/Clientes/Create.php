@@ -84,10 +84,30 @@ class Create extends Component
         //     $this->centros = $response['data'];
         // }
 
-        // Centros de prueba temporal
+        // Centros disponibles IMD
         $this->centros = [
-            ['id' => '9', 'nombre' => 'Centro de Prueba IMD'],
-            ['id' => '10', 'nombre' => 'Centro 2 IMD'],
+            ['id' => '2', 'nombre' => 'Mostoles'],
+            ['id' => '4', 'nombre' => 'Principe'],
+            ['id' => '5', 'nombre' => 'M. Urquijo'],
+            ['id' => '6', 'nombre' => 'Alcalá'],
+            ['id' => '7', 'nombre' => 'Valencia'],
+            ['id' => '8', 'nombre' => 'Oviedo'],
+            ['id' => '9', 'nombre' => 'Sevilla'],
+            ['id' => '10', 'nombre' => 'Raimundo'],
+            ['id' => '11', 'nombre' => 'Murcia'],
+            ['id' => '58', 'nombre' => 'Casanova'],
+            ['id' => '76', 'nombre' => 'Doctor Esquerdo'],
+            ['id' => '97', 'nombre' => 'Castellana'],
+            ['id' => '98', 'nombre' => 'Claris'],
+            ['id' => '316', 'nombre' => 'Bilbao'],
+            ['id' => '377', 'nombre' => 'Alicante'],
+            ['id' => '411', 'nombre' => 'Málaga'],
+            ['id' => '418', 'nombre' => 'Lesseps'],
+            ['id' => '443', 'nombre' => 'Palma de Mallorca'],
+            ['id' => '489', 'nombre' => 'Zaragoza'],
+            ['id' => '505', 'nombre' => 'Valladolid'],
+            ['id' => '544', 'nombre' => 'Córdoba'],
+            ['id' => '579', 'nombre' => 'Vigo'],
         ];
 
         // Días libres de prueba (próximos 7 días laborables)
