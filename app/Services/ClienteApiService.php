@@ -91,6 +91,7 @@ class ClienteApiService
         try {
             $body = array_merge([
                 'function' => 'getPacientes',
+                'id_usuario' => auth()->id(),
             ], $filters);
 
             Log::info('📤 [getPacientes] Petición al CRM', [
@@ -252,6 +253,7 @@ class ClienteApiService
                 'email' => $data['email'] ?? 'dfdsf@gmail.com',
                 'movil' => $data['telefono'] ?? '678128386',
                 'centro' => (int) ($data['centro_id'] ?? 4),
+                'id_usuario' => auth()->id(),
             ];
 
             Log::info('📤 [crearPaciente] Petición al CRM', [
