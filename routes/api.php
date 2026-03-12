@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClienteController;
+use App\Http\Controllers\Api\CrmUserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -34,4 +35,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [ClienteController::class, 'index']);
         Route::get('/{id}', [ClienteController::class, 'show']);
     });
+});
+// Rutas protegidas con API Key del CRM
+Route::group(['middleware' => ['crm_api']], function () {
+    // Crear usuarios desde el CRM
+    Route::post('/crm/user', [CrmUserController::class, 'store']);
 });
