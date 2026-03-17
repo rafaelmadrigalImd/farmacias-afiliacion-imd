@@ -295,7 +295,7 @@
                     <!-- Email -->
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Email <span class="text-red-500">*</span>
+                            Email
                         </label>
                         <input
                             type="email"
