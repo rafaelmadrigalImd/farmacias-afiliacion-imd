@@ -4,9 +4,9 @@
         <div class="flex justify-between h-20">
             <div class="flex">
                 <!-- Logo -->
-                <div class="shrink-0 flex items-center py-2">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-mark class="block h-12 sm:h-14 w-auto" />
+                <div class="shrink-0 flex items-center">
+                    <a href="{{ route('dashboard') }}" class="flex items-center">
+                        <x-application-mark class="block h-8 w-auto" />
                     </a>
                 </div>
 

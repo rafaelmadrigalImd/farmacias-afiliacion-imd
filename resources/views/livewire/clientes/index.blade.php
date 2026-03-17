@@ -125,13 +125,18 @@
                                             @if(!empty($cliente['estado']))
                                                 @php
                                                     $estadoClasses = match($cliente['estado']) {
-                                                        'estado_presentado' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-                                                        'activo' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-                                                        'inactivo' => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+                                                        'presentado' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+                                                        'no_presentado' => 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
+                                                        'no_se_sabe' => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
                                                         default => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                                                     };
-                                                    $estadoTexto = str_replace('estado_', '', $cliente['estado']);
-                                                    $estadoTexto = ucfirst(str_replace('_', ' ', $estadoTexto));
+
+                                                    $estadoTexto = match($cliente['estado']) {
+                                                        'presentado' => 'Presentado',
+                                                        'no_presentado' => 'No Presentado',
+                                                        'no_se_sabe' => 'No se sabe',
+                                                        default => ucfirst(str_replace('_', ' ', $cliente['estado']))
+                                                    };
                                                 @endphp
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $estadoClasses }}">
                                                     {{ $estadoTexto }}
@@ -141,14 +146,16 @@
                                             @if(!empty($cliente['contratos']))
                                                 @php
                                                     $contratoClasses = match($cliente['contratos']) {
-                                                        'activo' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
-                                                        'sin contratos' => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+                                                        'con_contratos' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
+                                                        'sin_contratos' => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
                                                         default => 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'
                                                     };
 
-                                                    $contratoTexto = $cliente['contratos'] === 'sin contratos'
-                                                        ? 'Sin contratos'
-                                                        : 'Contrato ' . ucfirst($cliente['contratos']);
+                                                    $contratoTexto = match($cliente['contratos']) {
+                                                        'con_contratos' => 'Con Contratos',
+                                                        'sin_contratos' => 'Sin Contratos',
+                                                        default => ucfirst(str_replace('_', ' ', $cliente['contratos']))
+                                                    };
                                                 @endphp
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $contratoClasses }}">
                                                     {{ $contratoTexto }}

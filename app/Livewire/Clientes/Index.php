@@ -18,6 +18,7 @@ class Index extends Component
     public $search = '';
 
     public $perPage = 5;
+
     public $errorMessage = '';
 
     protected $clienteService;
@@ -69,16 +70,32 @@ class Index extends Component
     {
         $centros = $this->getCentros();
 
-        return array_map(function($cliente) use ($centros) {
+        return array_map(function ($cliente) use ($centros) {
             // Transformar centro de ID a nombre
-            if (!empty($cliente['centro'])) {
+            if (! empty($cliente['centro'])) {
                 $centroId = $cliente['centro'];
                 $cliente['centro_nombre'] = $centros[$centroId] ?? "Centro #{$centroId}";
             }
 
-            // Transformar contratos "0" a "sin contratos"
-            if (isset($cliente['contratos']) && ($cliente['contratos'] === '0' || $cliente['contratos'] === 0)) {
-                $cliente['contratos'] = 'sin contratos';
+            // Transformar contratos booleano a texto legible
+            if (isset($cliente['contratos'])) {
+                if ($cliente['contratos'] === false || $cliente['contratos'] === 'false' || $cliente['contratos'] === '0' || $cliente['contratos'] === 0) {
+                    $cliente['contratos'] = 'sin_contratos';
+                } elseif ($cliente['contratos'] === true || $cliente['contratos'] === 'true' || $cliente['contratos'] === '1' || $cliente['contratos'] === 1) {
+                    $cliente['contratos'] = 'con_contratos';
+                }
+            }
+
+            // Transformar estado a formato normalizado
+            if (isset($cliente['estado'])) {
+                $estadoNormalizado = strtolower(trim($cliente['estado']));
+
+                $cliente['estado'] = match ($estadoNormalizado) {
+                    'no se sabe', 'nosesabe' => 'no_se_sabe',
+                    'presentado' => 'presentado',
+                    'nopresentado', 'no presentado' => 'no_presentado',
+                    default => $estadoNormalizado
+                };
             }
 
             return $cliente;
@@ -108,7 +125,7 @@ class Index extends Component
             // Filtrar por búsqueda si existe (búsqueda local)
             if ($this->search) {
                 $searchTerm = strtolower($this->search);
-                $allClientes = array_filter($allClientes, function($cliente) use ($searchTerm) {
+                $allClientes = array_filter($allClientes, function ($cliente) use ($searchTerm) {
                     return str_contains(strtolower($cliente['nombre'] ?? ''), $searchTerm) ||
                            str_contains(strtolower($cliente['email'] ?? ''), $searchTerm) ||
                            str_contains(strtolower($cliente['telefono'] ?? ''), $searchTerm);
