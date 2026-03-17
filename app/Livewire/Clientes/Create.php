@@ -122,8 +122,8 @@ class Create extends Component
 
         while ($count < 7) {
             $fecha = $fecha->addDay();
-            // Saltar fines de semana
-            if ($fecha->isWeekday()) {
+            // Saltar solo los domingos (permitir lunes a sábado)
+            if (!$fecha->isSunday()) {
                 $dias[] = [
                     'fecha' => $fecha->format('Y-m-d'),
                     'formatted' => $fecha->locale('es')->isoFormat('dddd, D [de] MMMM'),
