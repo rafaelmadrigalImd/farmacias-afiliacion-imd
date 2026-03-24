@@ -6,8 +6,8 @@
                 <x-welcome />
             </div>
 
-            <!-- Clientes Recientes Section -->
-            <livewire:dashboard.clientes-recientes />
+            {{-- TODO: Implementar componente de clientes recientes --}}
+            {{-- <livewire:dashboard.clientes-recientes /> --}}
         </div>
     </div>
 </x-app-layout>

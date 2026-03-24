@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+<div>
     <!-- Header Mobile-First -->
     <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
         <div class="px-4 sm:px-6 lg:px-8 py-4">

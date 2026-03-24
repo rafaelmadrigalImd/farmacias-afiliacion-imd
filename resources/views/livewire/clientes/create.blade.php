@@ -1,5 +1,4 @@
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900"
-     x-data="{
+<div x-data="{
          showSuccessModal: @entangle('appointmentSaved'),
          redirecting: false
      }"
@@ -171,7 +170,7 @@
                 @endif
 
                 <!-- Botones de Acción -->
-                <div class="flex flex-col sm:flex-row gap-3 sticky bottom-0 bg-gray-50 dark:bg-gray-900 py-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:bg-transparent sm:dark:bg-transparent">
+                <div class="flex flex-col sm:flex-row gap-3">
                     <button
                         type="button"
                         wire:click="guardarCita"
@@ -427,7 +426,7 @@
             </div>
 
             <!-- Botones de Acción -->
-            <div class="flex flex-col sm:flex-row gap-3 sticky bottom-0 bg-gray-50 dark:bg-gray-900 py-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:bg-transparent sm:dark:bg-transparent">
+            <div class="flex flex-col sm:flex-row gap-3">
                 <button
                     type="submit"
                     wire:loading.attr="disabled"
