@@ -13,6 +13,7 @@ class CrmUserController extends Controller
     /**
      * Crear un nuevo usuario desde el CRM
      *
+     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)

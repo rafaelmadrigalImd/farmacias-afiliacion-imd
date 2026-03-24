@@ -9,11 +9,12 @@ class PaginationHelper
     /**
      * Convierte una respuesta de API externa a un LengthAwarePaginator de Laravel
      *
-     * @param  array  $items  Los datos a paginar
-     * @param  array  $meta  Metadata de paginación de la API externa
-     * @param  int  $perPage  Elementos por página
-     * @param  int|null  $currentPage  Página actual (si es null, se toma de $meta)
-     * @param  array  $options  Opciones adicionales para el paginador
+     * @param array $items Los datos a paginar
+     * @param array $meta Metadata de paginación de la API externa
+     * @param int $perPage Elementos por página
+     * @param int|null $currentPage Página actual (si es null, se toma de $meta)
+     * @param array $options Opciones adicionales para el paginador
+     * @return LengthAwarePaginator
      */
     public static function createFromApiResponse(
         array $items,

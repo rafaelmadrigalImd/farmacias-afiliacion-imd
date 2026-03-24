@@ -16,10 +16,9 @@ class AuthenticateCRMApiKey
     public function handle(Request $request, Closure $next): Response
     {
         $apiKey = $request->header('X-API-Key');
-        if (! $apiKey || $apiKey != env('API_CRM_KEY')) {
+        if (!$apiKey || $apiKey != env("API_CRM_KEY")) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
         return $next($request);
     }
 }
