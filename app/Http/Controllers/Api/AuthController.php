@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -14,7 +13,6 @@ class AuthController extends Controller
     /**
      * Login y generación de token de API
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function login(Request $request)
@@ -26,7 +24,7 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (! $user || ! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['Las credenciales proporcionadas son incorrectas.'],
             ]);
@@ -45,7 +43,6 @@ class AuthController extends Controller
     /**
      * Logout y revocación del token actual
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function logout(Request $request)
@@ -61,7 +58,6 @@ class AuthController extends Controller
     /**
      * Revocar todos los tokens del usuario
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function logoutAll(Request $request)
@@ -77,7 +73,6 @@ class AuthController extends Controller
     /**
      * Obtener información del usuario autenticado
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function me(Request $request)
@@ -90,7 +85,6 @@ class AuthController extends Controller
     /**
      * Registro de nuevo usuario
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function register(Request $request)
