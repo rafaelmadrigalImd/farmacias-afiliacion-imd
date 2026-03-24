@@ -72,10 +72,8 @@
                 <!-- Lista de Clientes - Mobile First -->
                 <div class="space-y-3">
                     @foreach($clientes as $cliente)
-                        {{-- TODO: TEMPORAL - Deshabilitado hasta implementar funcionalidad de detalle --}}
-                        {{-- <a href="/clientes/{{ $cliente['id'] }}" wire:navigate
-                           class="block bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700"> --}}
-                        <div class="block bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 cursor-default">
+                        <a href="/clientes/{{ $cliente['id'] }}" wire:navigate
+                           class="block bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700">
                             <div class="p-4">
                                 <div class="flex items-start">
                                     <!-- Icono -->
@@ -165,14 +163,12 @@
                                     </div>
 
                                     <!-- Chevron -->
-                                    {{-- TODO: TEMPORAL - Ocultar chevron hasta implementar funcionalidad de detalle --}}
-                                    {{-- <svg class="w-5 h-5 text-gray-400 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5 text-gray-400 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                    </svg> --}}
+                                    </svg>
                                 </div>
                             </div>
-                        </div>
-                        {{-- </a> --}}
+                        </a>
                     @endforeach
                 </div>
 
