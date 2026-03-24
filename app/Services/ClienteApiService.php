@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 class ClienteApiService
 {
     protected string $baseUrl;
+
     protected string $apiKey;
 
     public function __construct()
@@ -181,7 +182,7 @@ class ClienteApiService
             // Obtener todos los pacientes
             $response = $this->getAll();
 
-            if (!$response['success']) {
+            if (! $response['success']) {
                 Log::error('❌ [getById] Error al obtener listado de pacientes', [
                     'id' => $id,
                 ]);
