@@ -16,6 +16,9 @@ class ClienteController extends Controller
 
     /**
      * Listado de clientes con paginación
+     *
+     * @param Request $request
+     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -62,6 +65,9 @@ class ClienteController extends Controller
 
     /**
      * Obtener un cliente específico por ID
+     *
+     * @param string $id
+     * @return JsonResponse
      */
     public function show(string $id): JsonResponse
     {

@@ -2,11 +2,11 @@
 
 namespace App\Livewire\Clientes;
 
-use App\Services\ClienteApiService;
-use Illuminate\Support\Facades\Log;
+use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Validate;
-use Livewire\Component;
+use App\Services\ClienteApiService;
+use Illuminate\Support\Facades\Log;
 
 #[Layout('layouts.app')]
 class Create extends Component
@@ -52,29 +52,20 @@ class Create extends Component
     public $centros = [];
 
     public $saving = false;
-
     public $errorMessage = '';
 
     // Control de flujo para creación de cita
     public $clienteSaved = false;
-
     public $creatingAppointment = false;
-
     public $clienteId = ''; // ID del cliente creado
-
     public $savingAppointment = false; // Estado de guardando cita
-
     public $appointmentSaved = false; // Cita guardada exitosamente
 
     // Datos de la cita
     public $diasLibres = [];
-
     public $horasLibres = [];
-
     public $diaSeleccionado = '';
-
     public $horaSeleccionada = '';
-
     public $horaIdSeleccionada = ''; // ID de la hora para enviar a la API
 
     protected $clienteService;
@@ -132,7 +123,7 @@ class Create extends Component
         while ($count < 7) {
             $fecha = $fecha->addDay();
             // Saltar solo los domingos (permitir lunes a sábado)
-            if (! $fecha->isSunday()) {
+            if (!$fecha->isSunday()) {
                 $dias[] = [
                     'fecha' => $fecha->format('Y-m-d'),
                     'formatted' => $fecha->locale('es')->isoFormat('dddd, D [de] MMMM'),
@@ -203,7 +194,6 @@ class Create extends Component
         if (empty($this->centro_id)) {
             $this->errorMessage = 'No se puede obtener las horas disponibles sin un centro seleccionado.';
             $this->horasLibres = [];
-
             return;
         }
 
@@ -242,7 +232,6 @@ class Create extends Component
         // Validaciones
         if (empty($this->diaSeleccionado) || empty($this->horaSeleccionada)) {
             $this->errorMessage = 'Debes seleccionar un día y una hora para la cita.';
-
             return;
         }
 
@@ -252,7 +241,6 @@ class Create extends Component
                 'cliente_saved' => $this->clienteSaved,
                 'creating_appointment' => $this->creatingAppointment,
             ]);
-
             return;
         }
 
@@ -296,7 +284,6 @@ class Create extends Component
     public function omitirCita()
     {
         session()->flash('success', 'Paciente registrado correctamente.');
-
         return $this->redirect('/clientes', navigate: true);
     }
 

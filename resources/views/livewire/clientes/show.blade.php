@@ -10,13 +10,7 @@
                         </svg>
                     </a>
                     <div class="flex-1 min-w-0">
-                        <h1 class="text-2xl font-bold text-gray-900 dark:text-white truncate">
-                            @if($cliente)
-                                {{ $cliente['nombre'] ?? 'Cliente' }}
-                            @else
-                                Cliente
-                            @endif
-                        </h1>
+                        <h1 class="text-2xl font-bold text-gray-900 dark:text-white truncate">Cliente</h1>
                         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Información detallada</p>
                     </div>
                 </div>
@@ -70,39 +64,6 @@
 
                 <!-- Datos -->
                 <div class="p-6 space-y-6">
-                    <!-- Farmacia que dio de alta -->
-                    @if(!empty($cliente['farmacia_alta']))
-                        <div class="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-4 border border-primary-200 dark:border-primary-800">
-                            <div class="flex items-start">
-                                <div class="flex-shrink-0">
-                                    <svg class="w-6 h-6 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                                    </svg>
-                                </div>
-                                <div class="ml-3 flex-1">
-                                    <p class="text-xs font-medium text-primary-800 dark:text-primary-300 uppercase tracking-wider">Farmacia que dio de alta</p>
-                                    <p class="mt-1 text-base font-semibold text-primary-900 dark:text-primary-100">
-                                        {{ $cliente['farmacia_alta'] }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-
-                    <!-- ID del Paciente -->
-                    @if(!empty($cliente['id']))
-                        <div>
-                            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Identificación</h3>
-                            <div class="space-y-3">
-                                <div class="flex items-start">
-                                    <span class="text-sm font-medium text-gray-500 dark:text-gray-400 w-32 flex-shrink-0">ID Paciente:</span>
-                                    <span class="text-sm text-gray-900 dark:text-white font-mono">{{ $cliente['id'] }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="border-t border-gray-200 dark:border-gray-700"></div>
-                    @endif
-
                     <!-- Información Básica -->
                     @if(isset($cliente['cif']) || isset($cliente['titular']))
                         <div>
@@ -110,13 +71,13 @@
                             <div class="space-y-3">
                                 @if(isset($cliente['cif']))
                                     <div class="flex items-start">
-                                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400 w-32 flex-shrink-0">CIF:</span>
+                                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400 w-24 flex-shrink-0">CIF:</span>
                                         <span class="text-sm text-gray-900 dark:text-white">{{ $cliente['cif'] }}</span>
                                     </div>
                                 @endif
                                 @if(isset($cliente['titular']))
                                     <div class="flex items-start">
-                                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400 w-32 flex-shrink-0">Titular:</span>
+                                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400 w-24 flex-shrink-0">Titular:</span>
                                         <span class="text-sm text-gray-900 dark:text-white">{{ $cliente['titular'] }}</span>
                                     </div>
                                 @endif
@@ -126,7 +87,7 @@
                     @endif
 
                     <!-- Contacto -->
-                    @if(isset($cliente['email']) || isset($cliente['telefono']) || isset($cliente['centro']))
+                    @if(isset($cliente['email']) || isset($cliente['telefono']))
                         <div>
                             <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Contacto</h3>
                             <div class="space-y-3">
@@ -148,14 +109,6 @@
                                         <a href="tel:{{ $cliente['telefono'] }}" class="text-sm text-primary-600 dark:text-primary-400 hover:underline">
                                             {{ $cliente['telefono'] }}
                                         </a>
-                                    </div>
-                                @endif
-                                @if(!empty($cliente['centro_nombre']))
-                                    <div class="flex items-center">
-                                        <svg class="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                                        </svg>
-                                        <span class="text-sm text-gray-900 dark:text-white">{{ $cliente['centro_nombre'] }}</span>
                                     </div>
                                 @endif
                             </div>
@@ -183,58 +136,9 @@
                         </div>
                     @endif
 
-                    <!-- Estado y Contratos -->
-                    @if(!empty($cliente['estado']) || !empty($cliente['contratos']))
-                        <div>
-                            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Estado</h3>
-                            <div class="flex flex-wrap gap-2">
-                                @if(!empty($cliente['estado']))
-                                    @php
-                                        $estadoClasses = match($cliente['estado']) {
-                                            'presentado' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800',
-                                            'no_presentado' => 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400 border-orange-200 dark:border-orange-800',
-                                            'no_se_sabe' => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600',
-                                            default => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600'
-                                        };
-
-                                        $estadoTexto = match($cliente['estado']) {
-                                            'presentado' => 'Presentado',
-                                            'no_presentado' => 'No Presentado',
-                                            'no_se_sabe' => 'No se sabe',
-                                            default => ucfirst(str_replace('_', ' ', $cliente['estado']))
-                                        };
-                                    @endphp
-                                    <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium border {{ $estadoClasses }}">
-                                        {{ $estadoTexto }}
-                                    </span>
-                                @endif
-
-                                @if(!empty($cliente['contratos']))
-                                    @php
-                                        $contratoClasses = match($cliente['contratos']) {
-                                            'con_contratos' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
-                                            'sin_contratos' => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600',
-                                            default => 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400 border-orange-200 dark:border-orange-800'
-                                        };
-
-                                        $contratoTexto = match($cliente['contratos']) {
-                                            'con_contratos' => 'Con Contratos',
-                                            'sin_contratos' => 'Sin Contratos',
-                                            default => ucfirst(str_replace('_', ' ', $cliente['contratos']))
-                                        };
-                                    @endphp
-                                    <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium border {{ $contratoClasses }}">
-                                        {{ $contratoTexto }}
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-                        <div class="border-t border-gray-200 dark:border-gray-700"></div>
-                    @endif
-
                     <!-- Observaciones -->
                     @if(isset($cliente['observaciones']) && $cliente['observaciones'])
-                        <div>
+                        <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
                             <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Observaciones</h3>
                             <p class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $cliente['observaciones'] }}</p>
                         </div>
