@@ -198,6 +198,32 @@
                         <div class="border-t border-gray-200 dark:border-gray-700"></div>
                     @endif
 
+                    <!-- Cita -->
+                    @if(!empty($cliente['dia']) || !empty($cliente['hora']))
+                        <div>
+                            <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Cita</h3>
+                            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-100 dark:border-blue-800">
+                                <div class="flex items-center">
+                                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    <div>
+                                        <p class="text-xs font-medium text-blue-700 dark:text-blue-300 uppercase tracking-wider">Fecha y hora de la cita</p>
+                                        <p class="mt-0.5 text-sm font-semibold text-blue-900 dark:text-blue-100">
+                                            @if(!empty($cliente['dia']))
+                                                {{ date('d/m/Y', strtotime($cliente['dia'])) }}
+                                            @endif
+                                            @if(!empty($cliente['hora']))
+                                                <span class="ml-1">a las {{ $cliente['hora'] }}</span>
+                                            @endif
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="border-t border-gray-200 dark:border-gray-700"></div>
+                    @endif
+
                     <!-- Ubicación -->
                     @if(isset($cliente['direccion']))
                         <div>
