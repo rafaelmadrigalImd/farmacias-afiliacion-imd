@@ -116,6 +116,20 @@
                                                     {{ $cliente['centro_nombre'] }}
                                                 </p>
                                             @endif
+
+                                            @if(!empty($cliente['dia']) || !empty($cliente['hora']))
+                                                <p class="text-sm text-gray-600 dark:text-gray-400 flex items-center">
+                                                    <svg class="w-4 h-4 mr-1.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                    </svg>
+                                                    @if(!empty($cliente['dia']))
+                                                        {{ date('d/m/Y', strtotime($cliente['dia'])) }}
+                                                    @endif
+                                                    @if(!empty($cliente['hora']))
+                                                        <span class="ml-1">a las {{ $cliente['hora'] }}</span>
+                                                    @endif
+                                                </p>
+                                            @endif
                                         </div>
 
                                         <!-- Status Badges -->
