@@ -126,11 +126,10 @@ class Create extends Component
     private function generarDiasLibresPrueba()
     {
         $dias = [];
-        $fecha = now();
+        $fecha = now()->startOfDay();
         $count = 0;
 
         while ($count < 7) {
-            $fecha = $fecha->addDay();
             // Saltar solo los domingos (permitir lunes a sábado)
             if (! $fecha->isSunday()) {
                 $dias[] = [
@@ -139,6 +138,8 @@ class Create extends Component
                 ];
                 $count++;
             }
+            // Avanzar al siguiente día después de verificar el día actual
+            $fecha = $fecha->addDay();
         }
 
         return $dias;
